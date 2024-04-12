@@ -137,12 +137,27 @@ func (arena *Arena) LoadSettings() error {
 	}
 	arena.EventSettings = settings
 
+	networkIds := network.UnifiIds{
+		Red1NetworkId:  "6615bdfe2d1a770d6d2c770f",
+		Red2NetworkId:  "6615be212d1a770d6d2c771b",
+		Red3NetworkId:  "66184a24314ad20b68e0ef32",
+		Blue1NetworkId: "66184a49314ad20b68e0ef36",
+		Blue2NetworkId: "66184a61314ad20b68e0ef39",
+		Blue3NetworkId: "66184a72314ad20b68e0ef3c",
+		Red1WifiId:     "6615be5a2d1a770d6d2c7721",
+		Red2WifiId:     "6615be4e2d1a770d6d2c771e",
+		Red3WifiId:     "66187f3e314ad20b68e0f033",
+		Blue1WifiId:    "66186796314ad20b68e0ef4b",
+		Blue2WifiId:    "66187f4d314ad20b68e0f035",
+		Blue3WifiId:    "66187f63314ad20b68e0f037",
+	}
+
 	// Initialize the components that depend on settings.
-	arena.accessPoint.SetSettings(settings.ApAddress, settings.ApUsername, settings.ApPassword,
-		settings.ApTeamChannel, settings.ApAdminChannel, settings.ApAdminWpaKey, settings.NetworkSecurityEnabled)
-	arena.accessPoint2.SetSettings(settings.Ap2Address, settings.Ap2Username, settings.Ap2Password,
-		settings.Ap2TeamChannel, 0, "", settings.NetworkSecurityEnabled)
-	arena.networkSwitch = network.NewSwitch(settings.SwitchAddress, settings.SwitchPassword)
+	unifi := network.NewUnifiClient("localhost:8443", "admin", "bluegold", networkIds)
+
+	arena.accessPoint.SetSettings(unifi)
+	arena.accessPoint2.SetSettings(unifi)
+	arena.networkSwitch = network.NewSwitch(unifi)
 	arena.Plc.SetAddress(settings.PlcAddress)
 	arena.TbaClient = partner.NewTbaClient(settings.TbaEventCode, settings.TbaSecretId, settings.TbaSecret)
 
